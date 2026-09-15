@@ -1,0 +1,44 @@
+{
+  "name": "ai_coursework_research",
+  "version": "0.0.0",
+  "private": true,
+  "description": "This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.",
+  "homepage": "https://github.com/sekema954/AI-Coursework-Research#readme",
+  "bugs": {
+    "url": "https://github.com/sekema954/AI-Coursework-Research/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sekema954/AI-Coursework-Research.git"
+  },
+  "license": "MIT",
+  "author": "Samuel Ekema",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "helmet": "^8.3.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.3",
+    "tailwindcss": "^4.3.3",
+    "uuid": "^14.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.1.0",
+    "oxlint": "^1.79.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.2"
+  }
+}
