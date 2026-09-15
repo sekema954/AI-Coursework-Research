@@ -19,11 +19,14 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && aws s3 sync dist/ s3://ai-in-course-work-survey-frontend/ --delete && aws cloudfront create-invalidation --distribution-id E29OBCXO1H9U5G --paths \"/*\""
+
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "helmet": "^8.3.0",
     "react": "^19.2.8",
