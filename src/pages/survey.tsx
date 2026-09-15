@@ -176,7 +176,7 @@ function back() {
 
 return (
     <div
-    className="min-h-full flex justify-center px-5 py-10 font-serif"
+    className="min-h-screen flex justify-center px-5 py-10 font-serif"
     style={{ background: PAPER, color: INK }}>
     <div className="w-full max-w-[520px]">
         {/* Header */}
