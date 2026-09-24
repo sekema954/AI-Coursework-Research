@@ -28,9 +28,11 @@ const QUESTIONS: Question[] = [
     type: "single",
     options: ["High school", "Undergraduate", "Graduate", "Other"],
 },
+
 {
     id: "frequency",
-    prompt: "How often do you use AI tools (ChatGPT, Claude, etc.) for schoolwork?",
+    prompt:
+    "How often do you use AI tools (ChatGPT, Claude, etc.) for schoolwork?",
     type: "single",
     options: [
     "Daily",
@@ -40,6 +42,7 @@ const QUESTIONS: Question[] = [
     "Never",
     ],
 },
+
 {
     id: "purpose",
     prompt: "What do you mainly use AI for in schoolwork?",
@@ -55,36 +58,156 @@ const QUESTIONS: Question[] = [
     "Studying for exams",
     ],
 },
+
 {
-    id: "depth",
+    id: "learningImpact",
     prompt:
-    "Do you feel you understand material as deeply when you use AI to help, compared to working through it alone?",
+    "How does using AI affect your understanding of course material?",
     type: "single",
     options: [
-    "Much less deeply",
-    "Somewhat less",
+    "Much worse",
+    "Somewhat worse",
     "About the same",
-    "Somewhat more deeply",
+    "Somewhat better",
+    "Much better",
     ],
 },
+
 {
-    id: "acceptable",
-    prompt: "Which of these would you consider acceptable use of AI on an assignment?",
+    id: "academicPerformance",
+    prompt: "How has using AI affected your academic performance?",
+    type: "single",
+    options: [
+    "Much worse",
+    "Somewhat worse",
+    "No noticeable change",
+    "Somewhat better",
+    "Much better",
+    ],
+},
+
+{
+    id: "criticalThinking",
+    prompt:
+    "How has using AI affected the amount of critical thinking you do when completing schoolwork?",
+    type: "single",
+    options: [
+    "Much less",
+    "Somewhat less",
+    "About the same",
+    "Somewhat more",
+    "Much more",
+    ],
+},
+
+{
+    id: "productivity",
+    prompt:
+    "How does AI affect the amount of time you spend completing schoolwork?",
+    type: "single",
+    options: [
+    "Takes much longer",
+    "Takes somewhat longer",
+    "No difference",
+    "Takes somewhat less time",
+    "Takes much less time",
+    ],
+},
+
+{
+    id: "dependency",
+    prompt:
+    "Do you feel you have become dependent on AI to complete schoolwork?",
+    type: "single",
+    options: [
+    "Not at all",
+    "Slightly",
+    "Moderately",
+    "Very dependent",
+    "Extremely dependent",
+    ],
+},
+
+{
+    id: "accuracy",
+    prompt:
+    "How often do you verify information provided by AI before using it?",
+    type: "single",
+    options: ["Always", "Usually", "Sometimes", "Rarely", "Never"],
+},
+
+{
+    id: "aiHarm",
+    prompt:
+    "Have you experienced any negative effects from using AI for schoolwork?",
     hint: "Choose all that apply",
     type: "multi",
     options: [
-    "Explaining a concept in simpler terms",
-    "Fixing grammar or spelling",
-    "Generating an outline",
-    "Writing a full draft I edit myself",
-    "Writing the whole thing to submit",
+    "Less motivation to learn independently",
+    "Less critical thinking",
+    "Greater dependence on AI",
+    "Incorrect or misleading information",
+    "Difficulty completing work without AI",
+    "No negative effects",
     ],
 },
+
+{
+    id: "aiBenefit",
+    prompt:
+    "What benefits have you experienced from using AI for schoolwork?",
+    hint: "Choose all that apply",
+    type: "multi",
+    options: [
+    "Better understanding of concepts",
+    "Improved grades",
+    "Saved time",
+    "Improved writing",
+    "Helped me study",
+    "Increased productivity",
+    "Greater confidence",
+    "No significant benefits",
+    ],
+},
+
+{
+    id: "schoolNeed",
+    prompt:
+    "How important do you think AI skills will be for students in the future?",
+    type: "single",
+    options: [
+    "Not important",
+    "Slightly important",
+    "Moderately important",
+    "Very important",
+    "Extremely important",
+    ],
+},
+
+{
+    id: "schoolUse",
+    prompt:
+    "Do you think students should be allowed to use AI for schoolwork?",
+    type: "single",
+    options: [
+    "Yes, with no restrictions",
+    "Yes, with clear guidelines",
+    "Only for certain types of work",
+    "Generally no",
+    "Not sure",
+    ],
+},
+
 {
     id: "guidance",
-    prompt: "Has your school given clear guidance on what AI use is allowed?",
+    prompt:
+    "Has your school given clear guidance on what AI use is allowed?",
     type: "single",
-    options: ["Yes, clear guidance", "Vague or inconsistent", "No guidance at all"],
+    options: [
+    "Yes, clear guidance",
+    "Vague or inconsistent",
+    "No guidance at all",
+    ],
 },
 ];
 
@@ -111,7 +234,8 @@ return (
 );
 }
 
-const API_URL = "http://localhost:3100"; // swap for deployed API URL in production
+const API_URL =
+"https://azf8oaxiuk.execute-api.us-east-1.amazonaws.com/prod";
 
 export default function SurveyApp() {
 const [step, setStep] = useState<number>(0);
@@ -125,19 +249,40 @@ const isLast = step === QUESTIONS.length - 1;
 const current: Answer | undefined = answers[q?.id];
 
 const canAdvance =
-    q?.type === "single" ? Boolean(current) : Array.isArray(current) && current.length > 0;
+    q?.type === "single"
+    ? Boolean(current)
+    : Array.isArray(current) && current.length > 0;
 
 function selectSingle(opt: string) {
-    setAnswers((a) => ({ ...a, [q.id]: opt }));
+    setAnswers((a) => ({
+    ...a,
+    [q.id]: opt,
+    }));
 }
 
 function toggleMulti(opt: string) {
     setAnswers((a) => {
-    const existing = Array.isArray(a[q.id]) ? (a[q.id] as string[]) : [];
+    const existing = Array.isArray(a[q.id])
+        ? (a[q.id] as string[])
+        : [];
+
     const has = existing.includes(opt);
-    if (has) return { ...a, [q.id]: existing.filter((o) => o !== opt) };
-    if (q.max && existing.length >= q.max) return a;
-    return { ...a, [q.id]: [...existing, opt] };
+
+    if (has) {
+        return {
+        ...a,
+        [q.id]: existing.filter((o) => o !== opt),
+        };
+    }
+
+    if (q.max && existing.length >= q.max) {
+        return a;
+    }
+
+    return {
+        ...a,
+        [q.id]: [...existing, opt],
+    };
     });
 }
 
@@ -151,67 +296,104 @@ async function next() {
     setError(null);
 
     try {
+    console.log("Submitting survey:", answers);
+
     const res = await fetch(`${API_URL}/survey-response`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(answers), // keys already match FastAPI's expected aliases
+        headers: {
+        "Content-Type": "application/json",
+        },
+        body: JSON.stringify(answers),
     });
 
+    const data = await res.json().catch(() => ({}));
+
+    console.log("API response:", data);
+
     if (!res.ok) {
-        throw new Error(`Server responded with ${res.status}`);
+        throw new Error(
+        data.message || `Server responded with ${res.status}`
+        );
     }
 
     setDone(true);
     } catch (err) {
-    console.error("Failed to submit survey response", err);
-    setError("Something went wrong submitting your response. Please try again.");
+    console.error("Failed to submit survey response:", err);
+
+    setError(
+        err instanceof Error
+        ? err.message
+        : "Something went wrong submitting your response. Please try again."
+    );
     } finally {
     setSubmitting(false);
     }
 }
 
 function back() {
-    if (step > 0) setStep((s) => s - 1);
+    if (step > 0) {
+    setStep((s) => s - 1);
+    }
 }
 
 return (
     <div
     className="min-h-screen flex justify-center px-5 py-10 font-serif"
-    style={{ background: PAPER, color: INK }}>
+    style={{
+        background: PAPER,
+        color: INK,
+    }}
+    >
     <div className="w-full max-w-[520px]">
         {/* Header */}
         <div className="flex justify-between items-baseline mb-7">
         <div>
             <div
             className="text-xs tracking-wide font-sans"
-            style={{ color: INK_SOFT }}>
+            style={{ color: INK_SOFT }}
+            >
             A short study on
             </div>
+
             <div className="text-[22px] font-semibold mt-0.5">
             AI use in coursework
             </div>
         </div>
-        {!done && <Tally total={QUESTIONS.length} current={step + 1} />}
+
+        {!done && (
+            <Tally
+            total={QUESTIONS.length}
+            current={step + 1}
+            />
+        )}
         </div>
 
         {/* Card */}
         <div
         className="rounded p-8 min-h-[320px] flex flex-col"
-        style={{ background: "#FBFAF6", border: `1px solid ${RULE}` }}>
+        style={{
+            background: "#FBFAF6",
+            border: `1px solid ${RULE}`,
+        }}
+        >
         {!done ? (
             <>
             <div
                 className="text-[11px] font-sans mb-2.5"
-                style={{ color: INK_SOFT }}>
+                style={{ color: INK_SOFT }}
+            >
                 Question {step + 1} of {QUESTIONS.length}
             </div>
 
-            <div className="text-lg leading-snug mb-1.5">{q.prompt}</div>
+            <div className="text-lg leading-snug mb-1.5">
+                {q.prompt}
+            </div>
 
             {q.hint ? (
                 <div
                 className="text-sm font-sans mb-4"
-                style={{ color: INK_SOFT }}>
+                style={{ color: INK_SOFT }}
+                >
                 {q.hint}
                 </div>
             ) : (
@@ -223,26 +405,41 @@ return (
                 const selected =
                     q.type === "single"
                     ? current === opt
-                    : Array.isArray(current) && current.includes(opt);
+                    : Array.isArray(current) &&
+                        current.includes(opt);
+
                 return (
                     <button
                     key={opt}
                     onClick={() =>
-                        q.type === "single" ? selectSingle(opt) : toggleMulti(opt)
+                        q.type === "single"
+                        ? selectSingle(opt)
+                        : toggleMulti(opt)
                     }
                     className="text-left rounded-sm px-3.5 py-3 text-[15px] font-serif cursor-pointer flex items-center gap-2.5 transition-all duration-150 ease-out"
                     style={{
-                        border: `1px solid ${selected ? ACCENT : RULE}`,
-                        background: selected ? ACCENT_SOFT : "transparent",
+                        border: `1px solid ${
+                        selected ? ACCENT : RULE
+                        }`,
+                        background: selected
+                        ? ACCENT_SOFT
+                        : "transparent",
                         color: INK,
-                    }}>
+                    }}
+                    >
                     <span
                         className={`w-3.5 h-3.5 flex-shrink-0 ${
-                        q.type === "single" ? "rounded-full" : "rounded-sm"
+                        q.type === "single"
+                            ? "rounded-full"
+                            : "rounded-sm"
                         }`}
                         style={{
-                        border: `1.5px solid ${selected ? ACCENT : INK_SOFT}`,
-                        background: selected ? ACCENT : "transparent",
+                        border: `1.5px solid ${
+                            selected ? ACCENT : INK_SOFT
+                        }`,
+                        background: selected
+                            ? ACCENT
+                            : "transparent",
                         }}/>
                     {opt}
                     </button>
@@ -257,20 +454,37 @@ return (
                 className="bg-transparent border-none text-sm p-0"
                 style={{
                     color: step === 0 ? RULE : INK_SOFT,
-                    cursor: step === 0 ? "default" : "pointer",
-                }}>
+                    cursor:
+                    step === 0 ? "default" : "pointer",
+                }}
+                >
                 Back
                 </button>
+
                 <button
                 onClick={next}
                 disabled={!canAdvance || submitting}
                 className="border-none rounded-sm px-5 py-2.5 text-sm font-semibold transition-colors duration-150 ease-out"
                 style={{
-                    background: canAdvance && !submitting ? ACCENT : RULE,
-                    color: canAdvance && !submitting ? "#FBFAF6" : "#948E82",
-                    cursor: canAdvance && !submitting ? "pointer" : "default",
-                }}>
-                {isLast ? (submitting ? "Submitting…" : "Submit") : "Next"}
+                    background:
+                    canAdvance && !submitting
+                        ? ACCENT
+                        : RULE,
+                    color:
+                    canAdvance && !submitting
+                        ? "#FBFAF6"
+                        : "#948E82",
+                    cursor:
+                    canAdvance && !submitting
+                        ? "pointer"
+                        : "default",
+                }}
+                >
+                {isLast
+                    ? submitting
+                    ? "Submitting…"
+                    : "Submit"
+                    : "Next"}
                 </button>
             </div>
 
@@ -285,13 +499,17 @@ return (
             </>
         ) : (
             <div className="flex flex-col items-start justify-center flex-1 gap-2">
-            <div className="text-lg font-semibold">Thanks for taking part.</div>
+            <div className="text-lg font-semibold">
+                Thanks for taking part.
+            </div>
+
             <div
                 className="text-sm leading-relaxed font-sans"
-                style={{ color: INK_SOFT }}>
-                Your responses have been recorded. They'll be used, alongside
-                everyone else's, to study how students are actually using AI
-                tools in coursework.
+                style={{ color: INK_SOFT }}
+            >
+                Your responses have been recorded. They'll be used,
+                alongside everyone else's, to study how students are
+                actually using AI tools in coursework.
             </div>
             </div>
         )}
@@ -299,7 +517,8 @@ return (
 
         <div
         className="mt-4 text-xs font-sans text-center"
-        style={{ color: INK_SOFT }}>
+        style={{ color: INK_SOFT }}
+        >
         Responses are anonymous and used for research purposes only.
         </div>
     </div>
