@@ -10,7 +10,8 @@
 A full-stack research project studying how students actually use AI tools
 (ChatGPT, Claude, etc.) in coursework, and where they draw the line on
 academic integrity. Data flows end-to-end from a live survey form through
-an AWS data pipeline into a BI dashboard and statistical analysis.
+an AWS data pipeline into a Snowflake warehouse, a BI dashboard, and
+statistical analysis.
 
 ## Overview
 
@@ -36,9 +37,11 @@ flowchart LR
     B --> C[("🗄️ Postgres\nRDS")]
     B --> D[("🪣 S3\nRaw JSON")]
     D --> E["🕸️ Glue Crawler"]
-    E --> F[("🔍 Athena")]
-    F --> G["📊 QuickSight"]
-    F --> H["🐍 pandas / scipy"]
+    E --> F[("🔍 Athena\nad hoc queries")]
+    D --> J["⚡ Snowpipe\nauto-ingest"]
+    J --> K[("❄️ Snowflake\nWarehouse")]
+    K --> G["📊 QuickSight"]
+    K --> H["🐍 pandas / scipy"]
     H --> I["📄 Research paper"]
 
     style A fill:#3E5C4E,color:#fff,stroke:none
@@ -50,6 +53,8 @@ flowchart LR
     style G fill:#8C4FFF,color:#fff,stroke:none
     style H fill:#645986,color:#fff,stroke:none
     style I fill:#B5533C,color:#fff,stroke:none
+    style J fill:#29B5E8,color:#fff,stroke:none
+    style K fill:#29B5E8,color:#fff,stroke:none
 ```
 
 <table>
@@ -76,21 +81,26 @@ flowchart LR
 </tr>
 <tr>
 <td>5</td>
-<td><b>Warehouse layer</b><br/>AWS Glue + Athena</td>
-<td>A Glue Crawler infers schema from S3 data; Athena provides serverless SQL on top of it — the query layer QuickSight and analysis scripts read from.</td>
+<td><b>Ad hoc query layer</b><br/>AWS Glue + Athena</td>
+<td>A Glue Crawler infers schema from S3 data; Athena provides serverless SQL directly on the raw files — useful for quick checks and for validating what landed in Snowflake.</td>
 </tr>
 <tr>
 <td>6</td>
-<td><b>Dashboard</b><br/>Amazon QuickSight</td>
-<td>Connected to Athena. Response distribution per question, cross-tabs (e.g. usage frequency vs. acceptable-use attitudes), response volume over time.</td>
+<td><b>Warehouse layer</b><br/>Snowflake + Snowpipe</td>
+<td>An S3 storage integration and external stage point at the raw JSON. Snowpipe auto-ingests new files (via S3 event notifications) into a raw <code>VARIANT</code> table, and a view or dynamic table flattens it into typed columns. This is the primary query layer for the dashboard and analysis scripts.</td>
 </tr>
 <tr>
 <td>7</td>
-<td><b>Statistical analysis</b><br/>Python (pandas, scipy)</td>
-<td>Pulls data via Athena (boto3) or Postgres directly. Chi-square tests and cross-tab significance testing on categorical responses.</td>
+<td><b>Dashboard</b><br/>Amazon QuickSight</td>
+<td>Connected to Snowflake. Response distribution per question, cross-tabs (e.g. usage frequency vs. acceptable-use attitudes), response volume over time.</td>
 </tr>
 <tr>
 <td>8</td>
+<td><b>Statistical analysis</b><br/>Python (pandas, scipy)</td>
+<td>Pulls data from Snowflake (<code>snowflake-connector-python</code>) or Postgres directly. Chi-square tests and cross-tab significance testing on categorical responses.</td>
+</tr>
+<tr>
+<td>9</td>
 <td><b>Research paper</b></td>
 <td>Standard structure — intro/motivation, methodology, results, discussion, limitations — built on the stats output and dashboard visuals.</td>
 </tr>
@@ -113,6 +123,7 @@ flowchart LR
 <img src="https://img.shields.io/badge/Amazon%20QuickSight-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white" alt="quicksight" />
 </p>
 <p>
+<img src="https://img.shields.io/badge/Snowflake-29B5E8?style=for-the-badge&logo=snowflake&logoColor=white" alt="snowflake" />
 <img src="https://img.shields.io/badge/pandas-150458?style=for-the-badge&logo=pandas&logoColor=white" alt="pandas" />
 <img src="https://img.shields.io/badge/SciPy-8CAAE6?style=for-the-badge&logo=scipy&logoColor=white" alt="scipy" />
 </p>
@@ -124,7 +135,8 @@ flowchart LR
 | Operational DB    | AWS RDS (Postgres)            |
 | Raw storage       | AWS S3                        |
 | Schema/catalog    | AWS Glue                      |
-| Query engine      | AWS Athena                    |
+| Ad hoc queries    | AWS Athena                    |
+| Warehouse         | Snowflake (Snowpipe)          |
 | Dashboard         | Amazon QuickSight             |
 | Analysis          | Python (pandas, scipy)        |
 
@@ -132,7 +144,8 @@ flowchart LR
 
 - [ ] Survey live and collecting responses
 - [ ] Target sample size: 150–200 responses
-- [ ] Pipeline verified end-to-end (form → Postgres → S3 → Athena)
+- [ ] Pipeline verified end-to-end (form → Postgres → S3 → Snowflake)
+- [ ] Snowpipe auto-ingest from S3 verified
 - [ ] QuickSight dashboard built
 - [ ] Statistical analysis complete
 - [ ] Paper draft written
@@ -140,8 +153,10 @@ flowchart LR
 ## Ethics & data handling
 
 Responses are collected anonymously. No personally identifying information
-is requested or stored. Raw data in S3 and Postgres should be treated as
-research data and access-restricted accordingly.
+is requested or stored. Raw data in S3, Postgres, and Snowflake should be
+treated as research data and access-restricted accordingly (least-privilege
+IAM roles for AWS, and a dedicated read-only Snowflake role for the
+dashboard and analysis scripts).
 
 ## License
 
