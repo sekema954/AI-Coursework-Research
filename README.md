@@ -7,6 +7,14 @@
 <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="license" />
 </p>
 
+## 📝 Take the Survey
+
+<p align="left">
+  <a href="https://www.smarmi.com">
+    <img src="https://img.shields.io/badge/TAKE%20THE%20SURVEY-www.smarmi.com-3E5C4E?style=for-the-badge" alt="Take the Survey" />
+  </a>
+</p>
+
 A full-stack research project studying how students actually use AI tools
 (ChatGPT, Claude, etc.) in coursework, and where they draw the line on
 academic integrity. Data flows end-to-end from a live survey form through
